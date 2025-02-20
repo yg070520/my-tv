@@ -45,19 +45,6 @@ jobs:
       - name: Run build with Gradle wrapper
         run: ./gradlew clean && ./gradlew assembleRelease
 
-      - name: Sign app APK
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          alias: ${{ secrets.ALIAS }}
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.ALIAS_PASSWORD }}
-        env:
-          # override default build-tools version (29.0.3) -- optional
-          BUILD_TOOLS_VERSION: "34.0.0"
-
       - name: Set Asset Name
         id: set_asset_name
         run: |
@@ -70,21 +57,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          asset_path: app/build/outputs/apk/release/app-release-unsigned.apk
           asset_name: ${{ env.asset_name }}
           asset_content_type: application/vnd.android.package-archive
-
-#      - name: Gitee Create Release
-#        run: |
-#          latest_commit=$(git rev-parse HEAD)
-#          history=$(cat history.md)
-#          curl -v POST https://gitee.com/api/v5/repos/${{ github.repository }}/releases \
-#          -H "Content-Type: application/json" \
-#          -d '{
-#            "access_token": "${{ secrets.GITEE_ACCESS_TOKEN}}",
-#            "tag_name": "${{ github.ref_name }}",
-#            "name": "Release ${{ github.ref_name }}",
-#            "body": "'"$history"'",
-#            "prerelease": false,
-#            "target_commitish": "'"$latest_commit"'"
-#          }'
