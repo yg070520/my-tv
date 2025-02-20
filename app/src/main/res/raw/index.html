@@ -297,8 +297,9 @@
         if (proxy && (!proxy.startsWith('http') && !proxy.startsWith('socks'))) {
             proxy = 'http://' + proxy;
         }
-        if (proxy && (!proxy.startsWith('http') || !proxy.startsWith('socks'))) {
-            alert(`無效的地址${proxy}`);
+// 验证输入必须以 http 或 socks 开头
+    if (proxy && (!proxy.startsWith('http://') && !proxy.startsWith('https://') && !proxy.startsWith('socks'))) {
+            alert(`無效的地址(CGD):${proxy}`);
             return;
         }
         if (proxy && !isValidUrl(proxy)) {
